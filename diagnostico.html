@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico MMH - More Minds and Hands</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1BC7B1;
+            --primary-dark: #14a391;
+            --accent: #0f172a;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: #334155;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            margin: 20px;
+            position: relative;
+        }
+
+        .brand {
+            text-align: center;
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+        .brand span { color: var(--primary); }
+
+        /* Lógica de Etapas */
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Progresso */
+        .progress-container { margin-bottom: 35px; }
+        .step-indicator {
+            text-align: center;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .progress-bar { height: 5px; background: #f1f5f9; border-radius: 10px; }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 14.2%; /* 1/7 */
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        h2 { color: var(--accent); font-size: 1.5rem; margin-bottom: 25px; font-weight: 700; text-align: left; border-left: 4px solid var(--primary); padding-left: 15px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--accent); }
+
+        input[type="text"], input[type="email"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(27, 199, 177, 0.1);
+        }
+
+        .options-grid { display: grid; gap: 8px; }
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8fafc;
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .option-item:hover { border-color: var(--primary); background: #fff; }
+        .option-item input { margin-right: 12px; accent-color: var(--primary); width: 17px; height: 17px; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+        .btn { padding: 16px; border-radius: 50px; font-weight: 700; text-transform: uppercase; cursor: pointer; border: none; transition: 0.3s; text-align: center; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-next:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-prev { background: transparent; color: #94a3b8; font-size: 0.8rem; text-decoration: underline; }
+
+        .hidden { display: none; }
+        small { color: #94a3b8; font-weight: normal; display: block; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand">USE<span>MMINDSH</span></div>
+
+    <div class="progress-container">
+        <div class="step-indicator">SEÇÃO <span id="currentStepNum">1</span> DE 7</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <form id="diagnosticoForm">
+        
+        <div class="step active" id="step1">
+            <h2>Informações Iniciais</h2>
+            <div class="form-group">
+                <label>1. Nome Completo *</label>
+                <input type="text" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label>2. Nome do salão / clínica *</label>
+                <input type="text" name="clinica" required>
+            </div>
+            <div class="form-group">
+                <label>3. Cidade / Estado *</label>
+                <input type="text" name="localizacao" required>
+            </div>
+            <div class="form-group">
+                <label>4. E-mail de contato *</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>5. WhatsApp *</label>
+                <input type="text" name="whatsapp" required placeholder="Com DDD">
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(2)">Próximo Passo</button>
+            </div>
+        </div>
+
+        <div class="step" id="step2">
+            <h2>Sobre Seu Negócio Atual</h2>
+            <div class="form-group">
+                <label>6. Como você classificaria o momento atual do seu salão?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="momento" value="Crescimento"> Em crescimento</label>
+                    <label class="option-item"><input type="radio" name="momento" value="Estável"> Estável, mas quero melhorar</label>
+                    <label class="option-item"><input type="radio" name="momento" value="Dificuldades"> Caindo / com dificuldades</label>
+                    <label class="option-item"><input type="radio" name="momento" value="Abrindo"> Estou abrindo um salão</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>7. Quantas pessoas trabalham no seu salão hoje?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="equipe" value="1"> Só eu</label>
+                    <label class="option-item"><input type="radio" name="equipe" value="2-5"> 2 a 5 pessoas</label>
+                    <label class="option-item"><input type="radio" name="equipe" value="6-10"> 6 a 10 pessoas</label>
+                    <label class="option-item"><input type="radio" name="equipe" value="10+"> Mais de 10 pessoas</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>8. Faturamento mensal médio (opcional)</label>
+                <select name="faturamento">
+                    <option value="Não informado">Selecione uma opção</option>
+                    <option value="Até 10k">Até R$ 10.000</option>
+                    <option value="10k-25k">R$ 10.001 a R$ 25.000</option>
+                    <option value="25k-50k">R$ 25.001 a R$ 50.000</option>
+                    <option value="Acima 50k">Acima de R$ 50.000</option>
+                    <option value="Prefiro não informar">Prefiro não informar</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>9. Quais áreas mais precisam de organização?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="checkbox" name="areas" value="Agendamentos"> Agendamentos</label>
+                    <label class="option-item"><input type="checkbox" name="areas" value="Finanças"> Fluxo de caixa / Adm</label>
+                    <label class="option-item"><input type="checkbox" name="areas" value="Clientes"> Captação e Fidelização</label>
+                    <label class="option-item"><input type="checkbox" name="areas" value="Equipe"> Gestão de colaboradores</label>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(3)">Próxima Seção</button>
+                <button type="button" class="btn btn-prev" onclick="prev(1)">Voltar</button>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <h2>Automação e Tecnologia</h2>
+            <div class="form-group">
+                <label>10. Você já usa algum sistema ou automação hoje?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="usa_sistema" value="Sim" onclick="toggleSistema(true)"> Sim</label>
+                    <label class="option-item"><input type="radio" name="usa_sistema" value="Não" onclick="toggleSistema(false)"> Não</label>
+                </div>
+            </div>
+            <div class="form-group hidden" id="qualSistemaDiv">
+                <label>11. Se sim, qual?</label>
+                <input type="text" name="nome_sistema">
+            </div>
+            <div class="form-group">
+                <label>12. Seu nível de familiaridade com tecnologia:</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="tecnologia" value="Iniciante"> Iniciante</label>
+                    <label class="option-item"><input type="radio" name="tecnologia" value="Intermediário"> Intermediário</label>
+                    <label class="option-item"><input type="radio" name="tecnologia" value="Avançado"> Avançado</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>13. Qual é sua maior dor hoje que a automação resolveria?</label>
+                <textarea name="dor_automacao" rows="3"></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(4)">Continuar</button>
+                <button type="button" class="btn btn-prev" onclick="prev(2)">Voltar</button>
+            </div>
+        </div>
+
+        <div class="step" id="step4">
+            <h2>Prontidão para Crescimento</h2>
+            <div class="form-group">
+                <label>14. Em qual velocidade você gostaria de ver a mudança?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="velocidade" value="Imediata"> Imediata – pronto(a) para mudar agora</label>
+                    <label class="option-item"><input type="radio" name="velocidade" value="30-60 dias"> Nos próximos 30 a 60 dias</label>
+                    <label class="option-item"><input type="radio" name="velocidade" value="Estudo"> Quero entender mais antes</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>15. Tempo semanal para dedicar a melhorias:</label>
+                <select name="tempo_dedicado">
+                    <option value="Menos de 1h">Menos de 1 hora</option>
+                    <option value="1-3h">1–3 horas</option>
+                    <option value="3-5h">3–5 horas</option>
+                    <option value="5h+">Mais de 5 horas</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(5)">Continuar</button>
+                <button type="button" class="btn btn-prev" onclick="prev(3)">Voltar</button>
+            </div>
+        </div>
+
+        <div class="step" id="step5">
+            <h2>Interesse em Automação (MMH)</h2>
+            <div class="form-group">
+                <label>16. Gostaria de um diagnóstico gratuito?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="quer_diag" value="Sim"> Sim, quero receber</label>
+                    <label class="option-item"><input type="radio" name="quer_diag" value="Talvez"> Talvez, quero entender melhor</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>17. Deseja aproveitar 50% de desconto no setup?</label>
+                <div class="options-grid">
+                    <label class="option-item"><input type="radio" name="quer_desconto" value="Sim"> Sim, quero o desconto</label>
+                    <label class="option-item"><input type="radio" name="quer_desconto" value="Avaliando"> Ainda estou avaliando</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>18. Como prefere ser contatado(a)?</label>
+                <select name="contato_pref">
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="E-mail">E-mail</option>
+                    <option value="Ligação">Ligação</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(6)">Ir para Plano de Ação</button>
+                <button type="button" class="btn btn-prev" onclick="prev(4)">Voltar</button>
+            </div>
+        </div>
+
+        <div class="step" id="step6">
+            <h2>Plano de Ação</h2>
+            <div class="form-group">
+                <label>19. Qual será seu primeiro passo nos próximos 7 dias?</label>
+                <textarea name="passo_7dias" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>20. Se pudesse melhorar apenas um processo agora, qual seria?</label>
+                <textarea name="um_processo" rows="3"></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="next(7)">Finalizar</button>
+                <button type="button" class="btn btn-prev" onclick="prev(5)">Voltar</button>
+            </div>
+        </div>
+
+        <div class="step" id="step7">
+            <h2>Compromisso com o Futuro</h2>
+            <div class="form-group">
+                <label>21. Assinatura (digite seu nome):</label>
+                <input type="text" name="assinatura" required>
+            </div>
+            <div class="form-group">
+                <label>22. Data do preenchimento:</label>
+                <input type="date" name="data_hoje" id="data_hoje">
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-next">Enviar Diagnóstico Agora</button>
+                <button type="button" class="btn btn-prev" onclick="prev(6)">Voltar</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    function next(s) {
+        // Validação simples
+        const current = document.querySelector('.step.active');
+        const req = current.querySelectorAll('input[required]');
+        let ok = true;
+        req.forEach(i => { if(!i.value) { i.style.borderColor = 'red'; ok = false; } else { i.style.borderColor = '#f1f5f9'; } });
+        
+        if(ok) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById('step' + s).classList.add('active');
+            const fill = document.getElementById('progressFill');
+            fill.style.width = (s / 7 * 100) + '%';
+            document.getElementById('currentStepNum').innerText = s;
+            window.scrollTo(0,0);
+        }
+    }
+
+    function prev(s) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + s).classList.add('active');
+        document.getElementById('progressFill').style.width = (s / 7 * 100) + '%';
+        document.getElementById('currentStepNum').innerText = s;
+    }
+
+    function toggleSistema(show) {
+        const div = document.getElementById('qualSistemaDiv');
+        show ? div.classList.remove('hidden') : div.classList.add('hidden');
+    }
+
+    document.getElementById('data_hoje').valueAsDate = new Date();
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwcrsvtd2kjpwJJ_ZH8tskNIc_Pidkb2MoqiaWjriBpjSsb-_HoLejZHckv9JJsTBQV/exec'; 
+
+    document.getElementById('diagnosticoForm').onsubmit = function(e) {
+        e.preventDefault();
+        const b = e.target.querySelector('button[type="submit"]');
+        b.innerText = "PROCESSANDO...";
+        b.disabled = true;
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(this)})
+            .then(() => {
+                alert('Diagnóstico enviado com sucesso! Verifique seu e-mail em breve.');
+                location.reload();
+            })
+            .catch(() => {
+                alert('Erro na conexão. Tente novamente.');
+                b.disabled = false;
+                b.innerText = "Enviar Diagnóstico Agora";
+            });
+    };
+</script>
+
+</body>
+</html>
