@@ -1,0 +1,14 @@
+# Logs de erro
+*.log
+
+# Pastas de sistema do Windows/Mac
+.DS_Store
+Thumbs.db
+
+# Arquivos de backup do editor
+.vscode/
+*.swp
+
+# Arquivos de dados de teste (caso você crie algum .csv ou .json)
+dados_teste.json
+clientes_real.csv
