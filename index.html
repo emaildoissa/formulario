@@ -47,7 +47,6 @@
         }
         .brand span { color: var(--primary); }
 
-        /* Lógica de Etapas */
         .step { display: none; }
         .step.active { display: block; animation: fadeIn 0.4s ease-out; }
 
@@ -56,7 +55,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Progresso */
         .progress-container { margin-bottom: 35px; }
         .step-indicator {
             text-align: center;
@@ -71,17 +69,35 @@
         .progress-fill {
             height: 100%;
             background: var(--primary);
-            width: 14.2%; /* 1/7 */
+            width: 14.2%;
             border-radius: 10px;
             transition: width 0.4s ease;
         }
 
-        h2 { color: var(--accent); font-size: 1.5rem; margin-bottom: 25px; font-weight: 700; text-align: left; border-left: 4px solid var(--primary); padding-left: 15px; }
+        h2 { 
+            color: var(--accent); 
+            font-size: 1.5rem; 
+            margin-bottom: 25px; 
+            font-weight: 700; 
+            text-align: left; 
+            border-left: 4px solid var(--primary); 
+            padding-left: 15px; 
+        }
         
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--accent); }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--accent); 
+        }
 
-        input[type="text"], input[type="email"], input[type="date"], select, textarea {
+        input[type="text"], 
+        input[type="email"], 
+        input[type="date"], 
+        select, 
+        textarea {
             width: 100%;
             padding: 14px;
             border: 2px solid #f1f5f9;
@@ -90,6 +106,7 @@
             font-size: 1rem;
             box-sizing: border-box;
             transition: 0.3s;
+            font-family: 'Inter', sans-serif;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -111,17 +128,73 @@
             transition: 0.2s;
             font-size: 0.95rem;
         }
-        .option-item:hover { border-color: var(--primary); background: #fff; }
-        .option-item input { margin-right: 12px; accent-color: var(--primary); width: 17px; height: 17px; }
+        .option-item:hover { 
+            border-color: var(--primary); 
+            background: #fff; 
+        }
+        .option-item input { 
+            margin-right: 12px; 
+            accent-color: var(--primary); 
+            width: 17px; 
+            height: 17px; 
+            cursor: pointer;
+        }
 
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-        .btn { padding: 16px; border-radius: 50px; font-weight: 700; text-transform: uppercase; cursor: pointer; border: none; transition: 0.3s; text-align: center; }
-        .btn-next { background: var(--primary); color: white; }
-        .btn-next:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .btn-prev { background: transparent; color: #94a3b8; font-size: 0.8rem; text-decoration: underline; }
+        .btn-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-top: 30px; 
+        }
+        .btn { 
+            padding: 16px; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            cursor: pointer; 
+            border: none; 
+            transition: 0.3s; 
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .btn-next { 
+            background: var(--primary); 
+            color: white; 
+        }
+        .btn-next:hover { 
+            background: var(--primary-dark); 
+            transform: translateY(-2px); 
+        }
+        .btn-next:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-prev { 
+            background: transparent; 
+            color: #94a3b8; 
+            font-size: 0.8rem; 
+            text-decoration: underline; 
+        }
 
         .hidden { display: none; }
-        small { color: #94a3b8; font-weight: normal; display: block; margin-top: 4px; }
+        small { 
+            color: #94a3b8; 
+            font-weight: normal; 
+            display: block; 
+            margin-top: 4px; 
+        }
+
+        .error-border {
+            border-color: #ef4444 !important;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
@@ -136,6 +209,7 @@
 
     <form id="diagnosticoForm">
         
+        <!-- ETAPA 1 -->
         <div class="step active" id="step1">
             <h2>Informações Iniciais</h2>
             <div class="form-group">
@@ -159,10 +233,11 @@
                 <input type="text" name="whatsapp" required placeholder="Com DDD">
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(2)">Próximo Passo</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(2)">Próximo Passo</button>
             </div>
         </div>
 
+        <!-- ETAPA 2 -->
         <div class="step" id="step2">
             <h2>Sobre Seu Negócio Atual</h2>
             <div class="form-group">
@@ -204,11 +279,12 @@
                 </div>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(3)">Próxima Seção</button>
-                <button type="button" class="btn btn-prev" onclick="prev(1)">Voltar</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(3)">Próxima Seção</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(1)">Voltar</button>
             </div>
         </div>
 
+        <!-- ETAPA 3 -->
         <div class="step" id="step3">
             <h2>Automação e Tecnologia</h2>
             <div class="form-group">
@@ -235,11 +311,12 @@
                 <textarea name="dor_automacao" rows="3"></textarea>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(4)">Continuar</button>
-                <button type="button" class="btn btn-prev" onclick="prev(2)">Voltar</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(4)">Continuar</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(2)">Voltar</button>
             </div>
         </div>
 
+        <!-- ETAPA 4 -->
         <div class="step" id="step4">
             <h2>Prontidão para Crescimento</h2>
             <div class="form-group">
@@ -260,11 +337,12 @@
                 </select>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(5)">Continuar</button>
-                <button type="button" class="btn btn-prev" onclick="prev(3)">Voltar</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(5)">Continuar</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(3)">Voltar</button>
             </div>
         </div>
 
+        <!-- ETAPA 5 -->
         <div class="step" id="step5">
             <h2>Interesse em Automação (MMH)</h2>
             <div class="form-group">
@@ -290,11 +368,12 @@
                 </select>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(6)">Ir para Plano de Ação</button>
-                <button type="button" class="btn btn-prev" onclick="prev(4)">Voltar</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(6)">Ir para Plano de Ação</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(4)">Voltar</button>
             </div>
         </div>
 
+        <!-- ETAPA 6 -->
         <div class="step" id="step6">
             <h2>Plano de Ação</h2>
             <div class="form-group">
@@ -306,11 +385,12 @@
                 <textarea name="um_processo" rows="3"></textarea>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-next" onclick="next(7)">Finalizar</button>
-                <button type="button" class="btn btn-prev" onclick="prev(5)">Voltar</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(7)">Finalizar</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(5)">Voltar</button>
             </div>
         </div>
 
+        <!-- ETAPA 7 -->
         <div class="step" id="step7">
             <h2>Compromisso com o Futuro</h2>
             <div class="form-group">
@@ -323,7 +403,7 @@
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-next">Enviar Diagnóstico Agora</button>
-                <button type="button" class="btn btn-prev" onclick="prev(6)">Voltar</button>
+                <button type="button" class="btn btn-prev" onclick="prevStep(6)">Voltar</button>
             </div>
         </div>
 
@@ -331,57 +411,100 @@
 </div>
 
 <script>
-    function next(s) {
-        // Validação simples
-        const current = document.querySelector('.step.active');
-        const req = current.querySelectorAll('input[required]');
-        let ok = true;
-        req.forEach(i => { if(!i.value) { i.style.borderColor = 'red'; ok = false; } else { i.style.borderColor = '#f1f5f9'; } });
+    // ===== NAVEGAÇÃO ENTRE ETAPAS =====
+    function nextStep(stepNumber) {
+        const currentStep = document.querySelector('.step.active');
+        const requiredInputs = currentStep.querySelectorAll('input[required], select[required], textarea[required]');
         
-        if(ok) {
+        let isValid = true;
+        
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('error-border');
+                isValid = false;
+            } else {
+                input.classList.remove('error-border');
+            }
+        });
+        
+        if (isValid) {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + s).classList.add('active');
-            const fill = document.getElementById('progressFill');
-            fill.style.width = (s / 7 * 100) + '%';
-            document.getElementById('currentStepNum').innerText = s;
-            window.scrollTo(0,0);
+            document.getElementById('step' + stepNumber).classList.add('active');
+            
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = (stepNumber / 7 * 100) + '%';
+            
+            document.getElementById('currentStepNum').innerText = stepNumber;
+            window.scrollTo(0, 0);
+        } else {
+            alert('⚠️ Por favor, preencha todos os campos obrigatórios.');
         }
     }
 
-    function prev(s) {
+    function prevStep(stepNumber) {
         document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-        document.getElementById('step' + s).classList.add('active');
-        document.getElementById('progressFill').style.width = (s / 7 * 100) + '%';
-        document.getElementById('currentStepNum').innerText = s;
+        document.getElementById('step' + stepNumber).classList.add('active');
+        
+        const progressFill = document.getElementById('progressFill');
+        progressFill.style.width = (stepNumber / 7 * 100) + '%';
+        
+        document.getElementById('currentStepNum').innerText = stepNumber;
+        window.scrollTo(0, 0);
     }
 
     function toggleSistema(show) {
         const div = document.getElementById('qualSistemaDiv');
-        show ? div.classList.remove('hidden') : div.classList.add('hidden');
+        if (show) {
+            div.classList.remove('hidden');
+        } else {
+            div.classList.add('hidden');
+        }
     }
 
+    // Define data de hoje automaticamente
     document.getElementById('data_hoje').valueAsDate = new Date();
 
-    
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0q2GKK8AC6qxBC9_UY7pSX8i4iH_eyEJufIUcG_W17Dx38quOMwHZNL46daLo6yI/exec';'
+    // ===== ENVIO DO FORMULÁRIO =====
+    // 🔥 SUBSTITUA ESTA URL PELA URL DO SEU GOOGLE APPS SCRIPT
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0q2GKK8AC6qxBC9_UY7pSX8i4iH_eyEJufIUcG_W17Dx38quOMwHZNL46daLo6yI/exec';'
 
-    document.getElementById('diagnosticoForm').onsubmit = function(e) {
+    document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const b = e.target.querySelector('button[type="submit"]');
-        b.innerText = "PROCESSANDO...";
-        b.disabled = true;
+        
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.innerText = "PROCESSANDO...";
+        submitButton.disabled = true;
 
-        fetch(scriptURL, { method: 'POST', body: new FormData(this)})
-            .then(() => {
-                alert('Diagnóstico enviado com sucesso! Verifique seu e-mail em breve.');
-                location.reload();
-            })
-            .catch(() => {
-                alert('Erro na conexão. Tente novamente.');
-                b.disabled = false;
-                b.innerText = "Enviar Diagnóstico Agora";
-            });
-    };
+        // Prepara FormData
+        const formData = new FormData(this);
+        
+        // Captura checkboxes de áreas e junta em uma string
+        const areasChecked = Array.from(document.querySelectorAll('input[name="areas"]:checked'))
+            .map(checkbox => checkbox.value)
+            .join(', ');
+        
+        // Remove entradas antigas de 'areas' e adiciona a versão concatenada
+        formData.delete('areas');
+        formData.append('areas', areasChecked);
+
+        // Envia para Google Apps Script
+        fetch(scriptUrl, { 
+            method: 'POST', 
+            body: formData 
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log('✅ Resposta do servidor:', result);
+            alert('✅ Diagnóstico enviado com sucesso! Verifique seu e-mail em breve.');
+            location.reload();
+        })
+        .catch(error => {
+            console.error('❌ Erro:', error);
+            alert('❌ Erro ao enviar. Verifique sua conexão e tente novamente.');
+            submitButton.disabled = false;
+            submitButton.innerText = "Enviar Diagnóstico Agora";
+        });
+    });
 </script>
 
 </body>
