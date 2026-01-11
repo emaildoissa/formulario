@@ -461,51 +461,91 @@
         }
     }
 
-    // Define data de hoje automaticamente
-    document.getElementById('data_hoje').valueAsDate = new Date();
+ // Define data de hoje automaticamente
+document.getElementById('data_hoje').valueAsDate = new Date();
 
-    // ===== ENVIO DO FORMULÁRIO =====
-    // 🔥 SUBSTITUA ESTA URL PELA URL DO SEU GOOGLE APPS SCRIPT
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0q2GKK8AC6qxBC9_UY7pSX8i4iH_eyEJufIUcG_W17Dx38quOMwHZNL46daLo6yI/exec';'
+// URL do Google Apps Script
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0q2GKK8AC6qxBC9_UY7pSX8i4iH_eyEJufIUcG_W17Dx38quOMwHZNL46daLo6yI/exec';
 
-    document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const submitButton = e.target.querySelector('button[type="submit"]');
-        submitButton.innerText = "PROCESSANDO...";
-        submitButton.disabled = true;
+document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.innerText = "PROCESSANDO...";
+    submitButton.disabled = true;
 
-        // Prepara FormData
-        const formData = new FormData(this);
-        
-        // Captura checkboxes de áreas e junta em uma string
-        const areasChecked = Array.from(document.querySelectorAll('input[name="areas"]:checked'))
-            .map(checkbox => checkbox.value)
+    // Função auxiliar para pegar valor de radio
+    function getRadio(name) {
+        const el = document.querySelector('input[name="' + name + '"]:checked');
+        return el ? el.value : '';
+    }
+    
+    // Função auxiliar para pegar valor de input/textarea
+    function getValue(selector) {
+        const el = document.querySelector(selector);
+        return el ? el.value : '';
+    }
+    
+    // Função para pegar checkboxes
+    function getCheckboxes(name) {
+        return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+            .map(cb => cb.value)
             .join(', ');
-        
-        // Remove entradas antigas de 'areas' e adiciona a versão concatenada
-        formData.delete('areas');
-        formData.append('areas', areasChecked);
+    }
 
-        // Envia para Google Apps Script
-        fetch(scriptUrl, { 
-            method: 'POST', 
-            body: formData 
-        })
-        .then(response => response.text())
-        .then(result => {
-            console.log('✅ Resposta do servidor:', result);
-            alert('✅ Diagnóstico enviado com sucesso! Verifique seu e-mail em breve.');
-            location.reload();
-        })
-        .catch(error => {
-            console.error('❌ Erro:', error);
-            alert('❌ Erro ao enviar. Verifique sua conexão e tente novamente.');
-            submitButton.disabled = false;
-            submitButton.innerText = "Enviar Diagnóstico Agora";
-        });
+    // Monta objeto com TODOS os campos NA ORDEM
+    const dados = {
+        nome: getValue('input[name="nome"]'),
+        clinica: getValue('input[name="clinica"]'),
+        localizacao: getValue('input[name="localizacao"]'),
+        email: getValue('input[name="email"]'),
+        whatsapp: getValue('input[name="whatsapp"]'),
+        momento: getRadio('momento'),
+        equipe: getRadio('equipe'),
+        faturamento: getValue('select[name="faturamento"]'),
+        areas: getCheckboxes('areas'),
+        usa_sistema: getRadio('usa_sistema'),
+        nome_sistema: getValue('input[name="nome_sistema"]'),
+        tecnologia: getRadio('tecnologia'),
+        dor_automacao: getValue('textarea[name="dor_automacao"]'),
+        velocidade: getRadio('velocidade'),
+        tempo_dedicado: getValue('select[name="tempo_dedicado"]'),
+        quer_diag: getRadio('quer_diag'),
+        quer_desconto: getRadio('quer_desconto'),
+        contato_pref: getValue('select[name="contato_pref"]'),
+        passo_7dias: getValue('textarea[name="passo_7dias"]'),
+        um_processo: getValue('textarea[name="um_processo"]'),
+        assinatura: getValue('input[name="assinatura"]'),
+        data_hoje: getValue('input[name="data_hoje"]')
+    };
+
+    // Log para debug
+    console.log('📤 DADOS A ENVIAR:', dados);
+
+    // Converte para FormData
+    const formData = new FormData();
+    for (let key in dados) {
+        formData.append(key, dados[key]);
+    }
+
+    // Envia
+    fetch(scriptUrl, { 
+        method: 'POST', 
+        body: formData 
+    })
+    .then(response => response.text())
+    .then(result => {
+        console.log('✅ Resposta do servidor:', result);
+        alert('✅ Diagnóstico enviado com sucesso!');
+        location.reload();
+    })
+    .catch(error => {
+        console.error('❌ Erro:', error);
+        alert('❌ Erro ao enviar. Tente novamente.');
+        submitButton.disabled = false;
+        submitButton.innerText = "Enviar Diagnóstico Agora";
     });
-</script>
 
+</script>
 </body>
 </html>
