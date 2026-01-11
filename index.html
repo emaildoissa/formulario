@@ -409,15 +409,13 @@
 
     </form>
 </div>
-
 <script>
-    // ===== NAVEGAÇÃO ENTRE ETAPAS =====
+    // ===== NAVEGAÇÃO =====
     function nextStep(stepNumber) {
         const currentStep = document.querySelector('.step.active');
         const requiredInputs = currentStep.querySelectorAll('input[required], select[required], textarea[required]');
         
         let isValid = true;
-        
         requiredInputs.forEach(input => {
             if (!input.value.trim()) {
                 input.classList.add('error-border');
@@ -430,10 +428,7 @@
         if (isValid) {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
             document.getElementById('step' + stepNumber).classList.add('active');
-            
-            const progressFill = document.getElementById('progressFill');
-            progressFill.style.width = (stepNumber / 7 * 100) + '%';
-            
+            document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
             document.getElementById('currentStepNum').innerText = stepNumber;
             window.scrollTo(0, 0);
         } else {
@@ -444,10 +439,7 @@
     function prevStep(stepNumber) {
         document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
         document.getElementById('step' + stepNumber).classList.add('active');
-        
-        const progressFill = document.getElementById('progressFill');
-        progressFill.style.width = (stepNumber / 7 * 100) + '%';
-        
+        document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
         document.getElementById('currentStepNum').innerText = stepNumber;
         window.scrollTo(0, 0);
     }
@@ -461,91 +453,78 @@
         }
     }
 
- // Define data de hoje automaticamente
-document.getElementById('data_hoje').valueAsDate = new Date();
+    document.getElementById('data_hoje').valueAsDate = new Date();
 
-// URL do Google Apps Script
-const scriptUrl = 'https://script.google.com/macros/s/AKfycbw5A6xBq2rOfBAcdJ5ZnrUTuI405pCNQd8NIIsF2ieQ_IfCCAbd8qtf1K7SMpiGupzH/exec';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwl6VPLHssOb9BLhiywfVApA07lRw3RvLJyT5DIhBW-6wq0v-iVHalDgfXtE2CL-DfM/exec';
 
-document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    submitButton.innerText = "PROCESSANDO...";
-    submitButton.disabled = true;
+    // ENVIO
+    document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.innerText = "PROCESSANDO...";
+        btn.disabled = true;
 
-    // Função auxiliar para pegar valor de radio
-    function getRadio(name) {
-        const el = document.querySelector('input[name="' + name + '"]:checked');
-        return el ? el.value : '';
-    }
-    
-    // Função auxiliar para pegar valor de input/textarea
-    function getValue(selector) {
-        const el = document.querySelector(selector);
-        return el ? el.value : '';
-    }
-    
-    // Função para pegar checkboxes
-    function getCheckboxes(name) {
-        return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
-            .map(cb => cb.value)
-            .join(', ');
-    }
+        function getRadio(name) {
+            const el = document.querySelector('input[name="' + name + '"]:checked');
+            return el ? el.value : '';
+        }
+        
+        function getValue(selector) {
+            const el = document.querySelector(selector);
+            return el ? el.value : '';
+        }
+        
+        function getCheckboxes(name) {
+            return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+                .map(cb => cb.value).join(', ');
+        }
 
-    // Monta objeto com TODOS os campos NA ORDEM
-    const dados = {
-        nome: getValue('input[name="nome"]'),
-        clinica: getValue('input[name="clinica"]'),
-        localizacao: getValue('input[name="localizacao"]'),
-        email: getValue('input[name="email"]'),
-        whatsapp: getValue('input[name="whatsapp"]'),
-        momento: getRadio('momento'),
-        equipe: getRadio('equipe'),
-        faturamento: getValue('select[name="faturamento"]'),
-        areas: getCheckboxes('areas'),
-        usa_sistema: getRadio('usa_sistema'),
-        nome_sistema: getValue('input[name="nome_sistema"]'),
-        tecnologia: getRadio('tecnologia'),
-        dor_automacao: getValue('textarea[name="dor_automacao"]'),
-        velocidade: getRadio('velocidade'),
-        tempo_dedicado: getValue('select[name="tempo_dedicado"]'),
-        quer_diag: getRadio('quer_diag'),
-        quer_desconto: getRadio('quer_desconto'),
-        contato_pref: getValue('select[name="contato_pref"]'),
-        passo_7dias: getValue('textarea[name="passo_7dias"]'),
-        um_processo: getValue('textarea[name="um_processo"]'),
-        assinatura: getValue('input[name="assinatura"]'),
-        data_hoje: getValue('input[name="data_hoje"]')
-    };
+        // USA URLSearchParams em vez de FormData
+        const params = new URLSearchParams();
+        params.append('nome', getValue('input[name="nome"]'));
+        params.append('clinica', getValue('input[name="clinica"]'));
+        params.append('localizacao', getValue('input[name="localizacao"]'));
+        params.append('email', getValue('input[name="email"]'));
+        params.append('whatsapp', getValue('input[name="whatsapp"]'));
+        params.append('momento', getRadio('momento'));
+        params.append('equipe', getRadio('equipe'));
+        params.append('faturamento', getValue('select[name="faturamento"]'));
+        params.append('areas', getCheckboxes('areas'));
+        params.append('usa_sistema', getRadio('usa_sistema'));
+        params.append('nome_sistema', getValue('input[name="nome_sistema"]'));
+        params.append('tecnologia', getRadio('tecnologia'));
+        params.append('dor_automacao', getValue('textarea[name="dor_automacao"]'));
+        params.append('velocidade', getRadio('velocidade'));
+        params.append('tempo_dedicado', getValue('select[name="tempo_dedicado"]'));
+        params.append('quer_diag', getRadio('quer_diag'));
+        params.append('quer_desconto', getRadio('quer_desconto'));
+        params.append('contato_pref', getValue('select[name="contato_pref"]'));
+        params.append('passo_7dias', getValue('textarea[name="passo_7dias"]'));
+        params.append('um_processo', getValue('textarea[name="um_processo"]'));
+        params.append('assinatura', getValue('input[name="assinatura"]'));
+        params.append('data_hoje', getValue('input[name="data_hoje"]'));
 
-    // Log para debug
-    console.log('📤 DADOS A ENVIAR:', dados);
+        console.log('📤 Enviando:', params.toString());
 
-    // Converte para FormData
-    const formData = new FormData();
-    for (let key in dados) {
-        formData.append(key, dados[key]);
-    }
-
-    // Envia
-    fetch(scriptUrl, { 
-        method: 'POST', 
-        body: formData 
-    })
-    .then(response => response.text())
-    .then(result => {
-        console.log('✅ Resposta do servidor:', result);
-        alert('✅ Diagnóstico enviado com sucesso!');
-        location.reload();
-    })
-    .catch(error => {
-        console.error('❌ Erro:', error);
-        alert('❌ Erro ao enviar. Tente novamente.');
-        submitButton.disabled = false;
-        submitButton.innerText = "Enviar Diagnóstico Agora";
+        fetch(scriptUrl, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(r => r.text())
+        .then(result => {
+            console.log('✅', result);
+            alert('✅ Enviado com sucesso!');
+            location.reload();
+        })
+        .catch(error => {
+            console.error('❌', error);
+            alert('❌ Erro. Tente novamente.');
+            btn.disabled = false;
+            btn.innerText = "Enviar Diagnóstico Agora";
+        });
     });
-
 </script>
 </body>
 </html>
