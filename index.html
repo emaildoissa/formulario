@@ -410,6 +410,7 @@
     </form>
 </div>
 <script>
+   <script>
     // ===== NAVEGAÇÃO =====
     function nextStep(stepNumber) {
         const currentStep = document.querySelector('.step.active');
@@ -455,55 +456,53 @@
 
     document.getElementById('data_hoje').valueAsDate = new Date();
 
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwl6VPLHssOb9BLhiywfVApA07lRw3RvLJyT5DIhBW-6wq0v-iVHalDgfXtE2CL-DfM/exec';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbw5A6xBq2rOfBAcdJ5ZnrUTuI405pCNQd8NIIsF2ieQ_IfCCAbd8qtf1K7SMpiGupzH/exec';
 
-    // ENVIO
+    // ===== ENVIO DO FORMULÁRIO =====
     document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const btn = e.target.querySelector('button[type="submit"]');
+        const btn = this.querySelector('button[type="submit"]');
         btn.innerText = "PROCESSANDO...";
         btn.disabled = true;
 
-        function getRadio(name) {
-            const el = document.querySelector('input[name="' + name + '"]:checked');
-            return el ? el.value : '';
-        }
+        // ✅ CAPTURA OS VALORES CORRETAMENTE
+        const formData = new FormData(this);
         
-        function getValue(selector) {
-            const el = document.querySelector(selector);
-            return el ? el.value : '';
-        }
+        // Captura checkboxes de áreas
+        const areasCheckboxes = document.querySelectorAll('input[name="areas"]:checked');
+        const areasArray = Array.from(areasCheckboxes).map(cb => cb.value);
+        const areasString = areasArray.join(', ');
         
-        function getCheckboxes(name) {
-            return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
-                .map(cb => cb.value).join(', ');
-        }
+        // Remove entradas antigas de 'areas' e adiciona concatenado
+        formData.delete('areas');
+        formData.append('areas', areasString);
 
-        // USA URLSearchParams em vez de FormData
+        // Converte para URLSearchParams para garantir ordem
         const params = new URLSearchParams();
-        params.append('nome', getValue('input[name="nome"]'));
-        params.append('clinica', getValue('input[name="clinica"]'));
-        params.append('localizacao', getValue('input[name="localizacao"]'));
-        params.append('email', getValue('input[name="email"]'));
-        params.append('whatsapp', getValue('input[name="whatsapp"]'));
-        params.append('momento', getRadio('momento'));
-        params.append('equipe', getRadio('equipe'));
-        params.append('faturamento', getValue('select[name="faturamento"]'));
-        params.append('areas', getCheckboxes('areas'));
-        params.append('usa_sistema', getRadio('usa_sistema'));
-        params.append('nome_sistema', getValue('input[name="nome_sistema"]'));
-        params.append('tecnologia', getRadio('tecnologia'));
-        params.append('dor_automacao', getValue('textarea[name="dor_automacao"]'));
-        params.append('velocidade', getRadio('velocidade'));
-        params.append('tempo_dedicado', getValue('select[name="tempo_dedicado"]'));
-        params.append('quer_diag', getRadio('quer_diag'));
-        params.append('quer_desconto', getRadio('quer_desconto'));
-        params.append('contato_pref', getValue('select[name="contato_pref"]'));
-        params.append('passo_7dias', getValue('textarea[name="passo_7dias"]'));
-        params.append('um_processo', getValue('textarea[name="um_processo"]'));
-        params.append('assinatura', getValue('input[name="assinatura"]'));
-        params.append('data_hoje', getValue('input[name="data_hoje"]'));
+        
+        params.append('nome', formData.get('nome') || '');
+        params.append('clinica', formData.get('clinica') || '');
+        params.append('localizacao', formData.get('localizacao') || '');
+        params.append('email', formData.get('email') || '');
+        params.append('whatsapp', formData.get('whatsapp') || '');
+        params.append('momento', formData.get('momento') || '');
+        params.append('equipe', formData.get('equipe') || '');
+        params.append('faturamento', formData.get('faturamento') || '');
+        params.append('areas', areasString);
+        params.append('usa_sistema', formData.get('usa_sistema') || '');
+        params.append('nome_sistema', formData.get('nome_sistema') || '');
+        params.append('tecnologia', formData.get('tecnologia') || '');
+        params.append('dor_automacao', formData.get('dor_automacao') || '');
+        params.append('velocidade', formData.get('velocidade') || '');
+        params.append('tempo_dedicado', formData.get('tempo_dedicado') || '');
+        params.append('quer_diag', formData.get('quer_diag') || '');
+        params.append('quer_desconto', formData.get('quer_desconto') || '');
+        params.append('contato_pref', formData.get('contato_pref') || '');
+        params.append('passo_7dias', formData.get('passo_7dias') || '');
+        params.append('um_processo', formData.get('um_processo') || '');
+        params.append('assinatura', formData.get('assinatura') || '');
+        params.append('data_hoje', formData.get('data_hoje') || '');
 
         console.log('📤 Enviando:', params.toString());
 
