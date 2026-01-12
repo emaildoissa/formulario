@@ -261,13 +261,13 @@
             <div class="form-group">
                 <label>8. Faturamento mensal médio (opcional)</label>
                 <select name="faturamento">
-                    <option value="Não informado">Selecione uma opção</option>
-                    <option value="Até 10k">Até R$ 10.000</option>
-                    <option value="10k-25k">R$ 10.001 a R$ 25.000</option>
-                    <option value="25k-50k">R$ 25.001 a R$ 50.000</option>
-                    <option value="Acima 50k">Acima de R$ 50.000</option>
-                    <option value="Prefiro não informar">Prefiro não informar</option>
-                </select>
+  <option value="">Selecione uma opção</option>
+  <option value="Até 10k">Até R$ 10.000</option>
+  <option value="10k-25k">R$ 10.001 a R$ 25.000</option>
+  <option value="25k-50k">R$ 25.001 a R$ 50.000</option>
+  <option value="Acima 50k">Acima de R$ 50.000</option>
+  <option value="Prefiro não informar">Prefiro não informar</option>
+</select>
             </div>
             <div class="form-group">
                 <label>9. Quais áreas mais precisam de organização?</label>
@@ -410,120 +410,138 @@
     </form>
 </div>
 <script>
-   <script>
-    // ===== NAVEGAÇÃO =====
-    function nextStep(stepNumber) {
-        const currentStep = document.querySelector('.step.active');
-        const requiredInputs = currentStep.querySelectorAll('input[required], select[required], textarea[required]');
-        
-        let isValid = true;
-        requiredInputs.forEach(input => {
-            if (!input.value.trim()) {
-                input.classList.add('error-border');
-                isValid = false;
-            } else {
-                input.classList.remove('error-border');
-            }
-        });
-        
-        if (isValid) {
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + stepNumber).classList.add('active');
-            document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
-            document.getElementById('currentStepNum').innerText = stepNumber;
-            window.scrollTo(0, 0);
-        } else {
-            alert('⚠️ Por favor, preencha todos os campos obrigatórios.');
-        }
+/* =========================
+   FUNÇÕES AUXILIARES
+========================= */
+
+function radioMarcado(name) {
+  return document.querySelector(`input[name="${name}"]:checked`);
+}
+
+function validarRadiosObrigatorios(stepId) {
+  const regras = {
+    step2: ['momento', 'equipe'],
+    step3: ['usa_sistema', 'tecnologia'],
+    step4: ['velocidade'],
+    step5: ['quer_diag', 'quer_desconto']
+  };
+
+  const obrigatorios = regras[stepId];
+  if (!obrigatorios) return true;
+
+  for (let campo of obrigatorios) {
+    if (!radioMarcado(campo)) {
+      alert('Por favor, responda todas as perguntas desta etapa.');
+      return false;
     }
+  }
+  return true;
+}
 
-    function prevStep(stepNumber) {
-        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-        document.getElementById('step' + stepNumber).classList.add('active');
-        document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
-        document.getElementById('currentStepNum').innerText = stepNumber;
-        window.scrollTo(0, 0);
+/* =========================
+   NAVEGAÇÃO
+========================= */
+
+function nextStep(stepNumber) {
+  const currentStep = document.querySelector('.step.active');
+  const stepId = currentStep.id;
+
+  if (!validarRadiosObrigatorios(stepId)) return;
+
+  const requiredInputs = currentStep.querySelectorAll(
+    'input[required], select[required], textarea[required]'
+  );
+
+  for (let input of requiredInputs) {
+    if (!input.value.trim()) {
+      input.classList.add('error-border');
+      return alert('Preencha todos os campos obrigatórios.');
     }
+    input.classList.remove('error-border');
+  }
 
-    function toggleSistema(show) {
-        const div = document.getElementById('qualSistemaDiv');
-        if (show) {
-            div.classList.remove('hidden');
-        } else {
-            div.classList.add('hidden');
-        }
-    }
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step' + stepNumber).classList.add('active');
+  document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
+  document.getElementById('currentStepNum').innerText = stepNumber;
+  window.scrollTo(0, 0);
+}
 
-    document.getElementById('data_hoje').valueAsDate = new Date();
+function prevStep(stepNumber) {
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step' + stepNumber).classList.add('active');
+  document.getElementById('progressFill').style.width = (stepNumber / 7 * 100) + '%';
+  document.getElementById('currentStepNum').innerText = stepNumber;
+  window.scrollTo(0, 0);
+}
 
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbw5A6xBq2rOfBAcdJ5ZnrUTuI405pCNQd8NIIsF2ieQ_IfCCAbd8qtf1K7SMpiGupzH/exec';
+function toggleSistema(show) {
+  document.getElementById('qualSistemaDiv').classList.toggle('hidden', !show);
+}
 
-    // ===== ENVIO DO FORMULÁRIO =====
-    document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const btn = this.querySelector('button[type="submit"]');
-        btn.innerText = "PROCESSANDO...";
-        btn.disabled = true;
+document.getElementById('data_hoje').valueAsDate = new Date();
 
-        // ✅ CAPTURA OS VALORES CORRETAMENTE
-        const formData = new FormData(this);
-        
-        // Captura checkboxes de áreas
-        const areasCheckboxes = document.querySelectorAll('input[name="areas"]:checked');
-        const areasArray = Array.from(areasCheckboxes).map(cb => cb.value);
-        const areasString = areasArray.join(', ');
-        
-        // Remove entradas antigas de 'areas' e adiciona concatenado
-        formData.delete('areas');
-        formData.append('areas', areasString);
+/* =========================
+   ENVIO
+========================= */
 
-        // Converte para URLSearchParams para garantir ordem
-        const params = new URLSearchParams();
-        
-        params.append('nome', formData.get('nome') || '');
-        params.append('clinica', formData.get('clinica') || '');
-        params.append('localizacao', formData.get('localizacao') || '');
-        params.append('email', formData.get('email') || '');
-        params.append('whatsapp', formData.get('whatsapp') || '');
-        params.append('momento', formData.get('momento') || '');
-        params.append('equipe', formData.get('equipe') || '');
-        params.append('faturamento', formData.get('faturamento') || '');
-        params.append('areas', areasString);
-        params.append('usa_sistema', formData.get('usa_sistema') || '');
-        params.append('nome_sistema', formData.get('nome_sistema') || '');
-        params.append('tecnologia', formData.get('tecnologia') || '');
-        params.append('dor_automacao', formData.get('dor_automacao') || '');
-        params.append('velocidade', formData.get('velocidade') || '');
-        params.append('tempo_dedicado', formData.get('tempo_dedicado') || '');
-        params.append('quer_diag', formData.get('quer_diag') || '');
-        params.append('quer_desconto', formData.get('quer_desconto') || '');
-        params.append('contato_pref', formData.get('contato_pref') || '');
-        params.append('passo_7dias', formData.get('passo_7dias') || '');
-        params.append('um_processo', formData.get('um_processo') || '');
-        params.append('assinatura', formData.get('assinatura') || '');
-        params.append('data_hoje', formData.get('data_hoje') || '');
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbxzhVp80_4NCSnBVBK9_-EJHIZ-hIc9nZc3eVEYcJ_wlXioBY32KUYJpAl6HqNNjmDC/exec';
 
-        console.log('📤 Enviando:', params.toString());
+document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-        fetch(scriptUrl, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        })
-        .then(r => r.text())
-        .then(result => {
-            console.log('✅', result);
-            alert('✅ Enviado com sucesso!');
-            location.reload();
-        })
-        .catch(error => {
-            console.error('❌', error);
-            alert('❌ Erro. Tente novamente.');
-            btn.disabled = false;
-            btn.innerText = "Enviar Diagnóstico Agora";
-        });
-    });
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerText = 'PROCESSANDO...';
+
+  const formData = new FormData(this);
+
+  // Checkboxes (areas)
+  const areas = [...document.querySelectorAll('input[name="areas"]:checked')]
+    .map(cb => cb.value)
+    .join(', ');
+
+  const params = new URLSearchParams({
+    nome: formData.get('nome') || '',
+    clinica: formData.get('clinica') || '',
+    localizacao: formData.get('localizacao') || '',
+    email: formData.get('email') || '',
+    whatsapp: formData.get('whatsapp') || '',
+    momento: formData.get('momento') || '',
+    equipe: formData.get('equipe') || '',
+    faturamento: formData.get('faturamento') || '',
+    areas: areas,
+    usa_sistema: formData.get('usa_sistema') || '',
+    nome_sistema: formData.get('nome_sistema') || '',
+    tecnologia: formData.get('tecnologia') || '',
+    dor_automacao: formData.get('dor_automacao') || '',
+    velocidade: formData.get('velocidade') || '',
+    tempo_dedicado: formData.get('tempo_dedicado') || '',
+    quer_diag: formData.get('quer_diag') || '',
+    quer_desconto: formData.get('quer_desconto') || '',
+    contato_pref: formData.get('contato_pref') || '',
+    passo_7dias: formData.get('passo_7dias') || '',
+    um_processo: formData.get('um_processo') || '',
+    assinatura: formData.get('assinatura') || '',
+    data_hoje: formData.get('data_hoje') || ''
+  });
+
+  fetch(scriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  })
+  .then(() => {
+    alert('Enviado com sucesso.');
+    location.reload();
+  })
+  .catch(() => {
+    alert('Erro ao enviar.');
+    btn.disabled = false;
+    btn.innerText = 'Enviar Diagnóstico Agora';
+  });
+});
 </script>
+
 </body>
 </html>
