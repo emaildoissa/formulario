@@ -485,47 +485,37 @@ document.getElementById('data_hoje').valueAsDate = new Date();
    ENVIO
 ========================= */
 
-const scriptUrl = 'https://script.google.com/macros/s/AKfycbwFB5VUD2wLwaRkfijf98DwrIVwDbYr5HxGgg9xVrmn4NRpOXZRtfrYG8xb1H-Dl8omsw/exec';
 
-document.getElementById('diagnosticoForm').addEventListener('submit', async function(e) {
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6H03fsESEmnqL0Pa1xU83-ZiCdLzk_2m3wIwTbwDU7RtDFLV26c3ZD_LdimUXKNbL/exec';
+
+document.getElementById('diagnosticoForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
   const form = new FormData(this);
+  const data = {};
 
-  const payload = {
-    nome: form.get('nome'),
-    clinica: form.get('clinica'),
-    localizacao: form.get('localizacao'),
-    email: form.get('email'),
-    whatsapp: form.get('whatsapp'),
-    momento: form.get('momento'),
-    equipe: form.get('equipe'),
-    faturamento: form.get('faturamento'),
-    areas: [...document.querySelectorAll('input[name="areas"]:checked')].map(c => c.value).join(', '),
-    usa_sistema: form.get('usa_sistema'),
-    nome_sistema: form.get('nome_sistema'),
-    tecnologia: form.get('tecnologia'),
-    dor_automacao: form.get('dor_automacao'),
-    velocidade: form.get('velocidade'),
-    tempo_dedicado: form.get('tempo_dedicado'),
-    quer_diag: form.get('quer_diag'),
-    quer_desconto: form.get('quer_desconto'),
-    contato_pref: form.get('contato_pref'),
-    passo_7dias: form.get('passo_7dias'),
-    um_processo: form.get('um_processo'),
-    assinatura: form.get('assinatura'),
-    data_hoje: form.get('data_hoje')
-  };
+  for (const [key, value] of form.entries()) {
+    if (data[key]) {
+      data[key] += ', ' + value; // checkbox múltiplo
+    } else {
+      data[key] = value;
+    }
+  }
 
-  await fetch(scriptUrl, {
+  fetch(scriptUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: new URLSearchParams(data)
+  })
+  .then(() => {
+    alert('Diagnóstico enviado com sucesso.');
+    location.reload();
+  })
+  .catch(() => {
+    alert('Erro ao enviar. Tente novamente.');
   });
-
-  alert('Enviado com sucesso');
-  location.reload();
 });
+</script>
+
 </script>
 
 </body>
