@@ -485,61 +485,46 @@ document.getElementById('data_hoje').valueAsDate = new Date();
    ENVIO
 ========================= */
 
-const scriptUrl = 'https://script.google.com/macros/s/AKfycbyAk0aPMh-QWxGL9E527IaKXDyxWccEFEP4L0CHDYKaKnPIF3GFtY76YGMf0ve_HScE/exec';
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbzrm9_r15_2sPN9NPQLtFYA54FRLufBaNeBYzPexAddJ135BgrH9b0NWI0epvkI4x-_/exec';
 
-document.getElementById('diagnosticoForm').addEventListener('submit', function(e) {
+document.getElementById('diagnosticoForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  const btn = this.querySelector('button[type="submit"]');
-  btn.disabled = true;
-  btn.innerText = 'PROCESSANDO...';
+  const form = new FormData(this);
 
-  const formData = new FormData(this);
+  const payload = {
+    nome: form.get('nome'),
+    clinica: form.get('clinica'),
+    localizacao: form.get('localizacao'),
+    email: form.get('email'),
+    whatsapp: form.get('whatsapp'),
+    momento: form.get('momento'),
+    equipe: form.get('equipe'),
+    faturamento: form.get('faturamento'),
+    areas: [...document.querySelectorAll('input[name="areas"]:checked')].map(c => c.value).join(', '),
+    usa_sistema: form.get('usa_sistema'),
+    nome_sistema: form.get('nome_sistema'),
+    tecnologia: form.get('tecnologia'),
+    dor_automacao: form.get('dor_automacao'),
+    velocidade: form.get('velocidade'),
+    tempo_dedicado: form.get('tempo_dedicado'),
+    quer_diag: form.get('quer_diag'),
+    quer_desconto: form.get('quer_desconto'),
+    contato_pref: form.get('contato_pref'),
+    passo_7dias: form.get('passo_7dias'),
+    um_processo: form.get('um_processo'),
+    assinatura: form.get('assinatura'),
+    data_hoje: form.get('data_hoje')
+  };
 
-  // Checkboxes (areas)
-  const areas = [...document.querySelectorAll('input[name="areas"]:checked')]
-    .map(cb => cb.value)
-    .join(', ');
-
-  const params = new URLSearchParams({
-    nome: formData.get('nome') || '',
-    clinica: formData.get('clinica') || '',
-    localizacao: formData.get('localizacao') || '',
-    email: formData.get('email') || '',
-    whatsapp: formData.get('whatsapp') || '',
-    momento: formData.get('momento') || '',
-    equipe: formData.get('equipe') || '',
-    faturamento: formData.get('faturamento') || '',
-    areas: areas,
-    usa_sistema: formData.get('usa_sistema') || '',
-    nome_sistema: formData.get('nome_sistema') || '',
-    tecnologia: formData.get('tecnologia') || '',
-    dor_automacao: formData.get('dor_automacao') || '',
-    velocidade: formData.get('velocidade') || '',
-    tempo_dedicado: formData.get('tempo_dedicado') || '',
-    quer_diag: formData.get('quer_diag') || '',
-    quer_desconto: formData.get('quer_desconto') || '',
-    contato_pref: formData.get('contato_pref') || '',
-    passo_7dias: formData.get('passo_7dias') || '',
-    um_processo: formData.get('um_processo') || '',
-    assinatura: formData.get('assinatura') || '',
-    data_hoje: formData.get('data_hoje') || ''
-  });
-
-  fetch(scriptUrl, {
+  await fetch(scriptUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString()
-  })
-  .then(() => {
-    alert('Enviado com sucesso.');
-    location.reload();
-  })
-  .catch(() => {
-    alert('Erro ao enviar.');
-    btn.disabled = false;
-    btn.innerText = 'Enviar Diagnóstico Agora';
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
   });
+
+  alert('Enviado com sucesso');
+  location.reload();
 });
 </script>
 
